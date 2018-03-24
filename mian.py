@@ -1,4 +1,4 @@
-”“”Maximize The Point Counts
+"""Maximize The Point Counts
 Usage: python3 <script> <input.vectors> <input.accuracy> <cutoff>
 """
 import os
@@ -30,3 +30,35 @@ for ci in c:
     if len(c[ci]) > 4:
         mark.append(ci)
 
+sc = []
+sck = []
+dustbin = []
+for ci in c:
+    if c not in mark:
+        sc.append(c[ci])
+        sck.append(ck[ci])
+        dustbin.append(ci)
+
+for ds in dustbin:
+	c.pop(ds)
+	cc.pop(ds)
+	ck.pop(ds)
+
+for p in c:
+	d_list = mt.dist_list(c[p], cc[p], dim, r)
+	n = len(c[p])
+	mean_ = mt.mean(d_list, n)
+	stdvar_ = mt.std_var(d_list, mean_, n)
+	var_ = stdvar_ ** 2
+	q = mt.q_value(r, mean_, var_)
+	tor = round(len(c[p])*q)
+	if tor >= 1:
+		belongs, bk, sc, sck = f.scsortncut(dim, cc[p], sc, sck, tor, mean_, stdvar_)
+		c[p] = c[p] + belongs
+		ck[p] = ck[p] + bk
+
+if len(sc) > 0:
+	for i in range(len(sc)):
+		c[raw_cluster+i] = sc[i][:]
+		cc[raw_cluster+i] = sc[i][:]
+		ck[raw_cluster+i] = sck[i][:]
