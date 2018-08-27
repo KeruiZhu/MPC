@@ -94,3 +94,28 @@ def maxcluster(vectors, seq_dist, d, r, dim):
             realcenter_ = realcenter(bining)
             distbridge = seq_dist(realcenter_, reads[center])
         # section 3: clustering
+        print(distbridge)
+        bining = []
+        dustbin_reads = []
+        for a in reads:
+            if seqdis(realcenter_, reads[a]) < r:
+                bining.append(reads[a])
+                dustbin_reads.append(a)
+        if len(dustbin_reads) <= 1:
+            bad_center.append(center)
+            print('continue')
+            continue
+        clu[p] = bining
+        clukey[p] = dustbin_reads  # output the pointer hereafter.
+        cluc[p] = realcenter_
+        for d in dustbin_reads:
+            reads.pop(d)
+            cp_dict.pop(d)
+        for di in dm:
+            if di[0] in dustbin_reads or di[1] in dustbin_reads:
+                dustbin_dm.appedn(di)
+        for d in dustbin_dm:
+            dm.pop(d)
+        print('cluNo.'+str(p), len(clu[p-1]), len(reads))
+
+    return clu, cluc, clukey
