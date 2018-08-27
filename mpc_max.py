@@ -1,4 +1,3 @@
-from mpc_lib import seqdis, realcenter
 from math import exp
 from mathtool import confidence_interval
 
@@ -9,7 +8,40 @@ def sigmoid(x, scale):
     return y
 
 
-def maxcluster(vectors, d, r, dim):
+def realcenter(group):
+    # given a equal-length group of sequences, return their mode by digit.
+    leng = len(group[0])
+    if leng <= 0:
+        raise RuntimeError('input group is empty!')
+    if type(group[0]) == type([]):
+        flag = 'list'
+        res = []
+    if type(group[0]) == type(''):
+        flag = 'str'
+        res = ''
+    for i in range(leng):
+        freq_hash = {}
+        max_freq = 0
+        key = None
+        for ele in group:
+            if len(ele) <= i:
+                continue
+            else:
+                if ele[i] not in freq_hash:
+                    freq_hash[ele[i]] = 1
+                else:
+                    freq_hash[ele[i]] += 1
+            if freq_hash[ele[i]] > max_freq:
+                max_freq = freq_hash[ele[i]]
+                key = ele[i]
+        if flag == 'list':
+            res.append(ele[i])
+        if flag == 'str':
+            res += ele[i]
+
+    return res
+
+def maxcluster(vectors, seq_dist, d, r, dim):
     # d the distance matrix
     # r the cluster semidiameter
     # dim the dimension of the vectors
@@ -39,3 +71,26 @@ def maxcluster(vectors, d, r, dim):
                     cpm = cp
                     center = di
             cp_dict[di] = 2
+
+        # section 2: pre cluster.
+        print('-'*40+'\n', cpm, sca)
+        if cpm <= 2:  # once there's no proper cluster center, put all the rest points in SCs
+            for a in reads:
+                clu[p] = [reads[a]]
+                cluc[p] = read[a]
+                clukey[p] = [a]
+                p += 1
+            reads = {}
+        else:  # else, find their realcenter and recluter
+            bining = [reads[center]]
+            dustbin_reads = [center]
+            dustbin_dm = []
+            for a in reads:
+                cc = min(a, center)
+                dd = max(a, cneter)
+                if (cc, dd) in dm and dm[cc, dd] <= sca:
+                    bining.append(reads[a])
+                    dustbin_reads.append(a)
+            realcenter_ = realcenter(bining)
+            distbridge = seq_dist(realcenter_, reads[center])
+        # section 3: clustering
