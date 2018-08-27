@@ -77,7 +77,7 @@ def maxcluster(vectors, seq_dist, dm, r, dim):
         if cpm <= 2:  # once there's no proper cluster center, put all the rest points in SCs
             for a in space:
                 clu[p] = [space[a]]
-                cluc[p] = read[a]
+                cluc[p] = space[a]
                 clukey[p] = [a]
                 p += 1
             space = {}
@@ -87,18 +87,18 @@ def maxcluster(vectors, seq_dist, dm, r, dim):
             dustbin_dm = []
             for a in space:
                 cc = min(a, center)
-                dd = max(a, cneter)
+                dd = max(a, center)
                 if (cc, dd) in dm and dm[cc, dd] <= sca:
                     bining.append(space[a])
                     dustbin_space.append(a)
             realcenter_ = realcenter(bining)
             distbridge = seq_dist(realcenter_, space[center])
+            print(distbridge)
         # section 3: clustering
-        print(distbridge)
         bining = []
         dustbin_space = []
         for a in space:
-            if seqdis(realcenter_, space[a]) < r:
+            if seq_dist(realcenter_, space[a]) < r:
                 bining.append(space[a])
                 dustbin_space.append(a)
         if len(dustbin_space) <= 1:
@@ -113,9 +113,10 @@ def maxcluster(vectors, seq_dist, dm, r, dim):
             cp_dict.pop(d)
         for di in dm:
             if di[0] in dustbin_space or di[1] in dustbin_space:
-                dustbin_dm.appedn(di)
+                dustbin_dm.append(di)
         for d in dustbin_dm:
             dm.pop(d)
+        p += 1
         print('cluNo.'+str(p), len(clu[p-1]), len(space))
 
     return clu, cluc, clukey
