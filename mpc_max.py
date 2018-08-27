@@ -41,15 +41,15 @@ def realcenter(group):
 
     return res
 
-def maxcluster(vectors, seq_dist, d, r, dim):
-    # d the distance matrix
+def maxcluster(vectors, seq_dist, dm, r, dim):
+    # dm the distance matrix
     # r the cluster semidiameter
     # dim the dimension of the vectors
     n = len(vectors)
     space = {}
     cp_dict = {}  # count-point records
     for i in range(n):
-        reads[i] = vectors[i]
+        space[i] = vectors[i]
         cp_dict[i] = 2
     clu = {}  # cluster
     cluc = {}  # center of cluster
@@ -60,10 +60,10 @@ def maxcluster(vectors, seq_dist, d, r, dim):
     while len(space) > 0:
         # section 1: max cluster point search
         cpm = 0
-        for di in d:
-            if d[di] <= sca:
+        for di in dm:
+            if dm[di] <= sca:
                 cp_dict[di[0]] += sigmoid(dm[di], sca)
-                cp_dict[di[1]] += sigmoid(dm[di], sac)
+                cp_dict[di[1]] += sigmoid(dm[di], sca)
         for di in cp_dict:
             if di not in bad_center:
                 cp = cp_dict[di]
@@ -75,47 +75,47 @@ def maxcluster(vectors, seq_dist, d, r, dim):
         # section 2: pre cluster.
         print('-'*40+'\n', cpm, sca)
         if cpm <= 2:  # once there's no proper cluster center, put all the rest points in SCs
-            for a in reads:
-                clu[p] = [reads[a]]
+            for a in space:
+                clu[p] = [space[a]]
                 cluc[p] = read[a]
                 clukey[p] = [a]
                 p += 1
-            reads = {}
+            space = {}
         else:  # else, find their realcenter and recluter
-            bining = [reads[center]]
-            dustbin_reads = [center]
+            bining = [space[center]]
+            dustbin_space = [center]
             dustbin_dm = []
-            for a in reads:
+            for a in space:
                 cc = min(a, center)
                 dd = max(a, cneter)
                 if (cc, dd) in dm and dm[cc, dd] <= sca:
-                    bining.append(reads[a])
-                    dustbin_reads.append(a)
+                    bining.append(space[a])
+                    dustbin_space.append(a)
             realcenter_ = realcenter(bining)
-            distbridge = seq_dist(realcenter_, reads[center])
+            distbridge = seq_dist(realcenter_, space[center])
         # section 3: clustering
         print(distbridge)
         bining = []
-        dustbin_reads = []
-        for a in reads:
-            if seqdis(realcenter_, reads[a]) < r:
-                bining.append(reads[a])
-                dustbin_reads.append(a)
-        if len(dustbin_reads) <= 1:
+        dustbin_space = []
+        for a in space:
+            if seqdis(realcenter_, space[a]) < r:
+                bining.append(space[a])
+                dustbin_space.append(a)
+        if len(dustbin_space) <= 1:
             bad_center.append(center)
             print('continue')
             continue
         clu[p] = bining
-        clukey[p] = dustbin_reads  # output the pointer hereafter.
+        clukey[p] = dustbin_space  # output the pointer hereafter.
         cluc[p] = realcenter_
-        for d in dustbin_reads:
-            reads.pop(d)
+        for d in dustbin_space:
+            space.pop(d)
             cp_dict.pop(d)
         for di in dm:
-            if di[0] in dustbin_reads or di[1] in dustbin_reads:
+            if di[0] in dustbin_space or di[1] in dustbin_space:
                 dustbin_dm.appedn(di)
         for d in dustbin_dm:
             dm.pop(d)
-        print('cluNo.'+str(p), len(clu[p-1]), len(reads))
+        print('cluNo.'+str(p), len(clu[p-1]), len(space))
 
     return clu, cluc, clukey
